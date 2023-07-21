@@ -1,0 +1,56 @@
+Сначала я создала базу данных:
+
+CREATE TABLE pilot (
+  pilot_id int NOT NULL AUTO_INCREMENT PRIMARY KEY, 
+  first_name varchar(255), 
+  last_name varchar(255)
+);
+CREATE TABLE airplane (
+  airplane_id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  model varchar(255)
+);
+CREATE TABLE airplane_pilot (
+  id int NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  pilot_id int,
+  airplane_id int,
+  flight_date DATE,
+  FOREIGN KEY (pilot_id) REFERENCES pilot(pilot_id),
+  FOREIGN KEY (airplane_id) REFERENCES airplane(airplane_id)
+);
+
+INSERT INTO pilot VALUES (1, 'Сергей', 'Шарапов');
+INSERT INTO pilot VALUES (2, 'Саня', 'Сыч');
+INSERT INTO pilot VALUES (3, 'Маша', 'Сыч');
+INSERT INTO pilot VALUES (4, 'Дима', 'Валиев');
+INSERT INTO pilot VALUES (5, 'Ира', 'Смирнова');
+
+INSERT INTO airplane VALUES (1, 'Boeing');
+INSERT INTO airplane VALUES (2, 'Сухой');
+INSERT INTO airplane VALUES (3, 'Airbus');
+
+INSERT INTO airplane_pilot VALUES (1, 1, 1, '2022-02-28');
+INSERT INTO airplane_pilot VALUES (2, 2, 1, '2022-02-28');
+INSERT INTO airplane_pilot VALUES (3, 1, 1, '2022-02-28');
+INSERT INTO airplane_pilot VALUES (4, 3, 1, '2022-02-28');
+INSERT INTO airplane_pilot VALUES (5, 4, 2, '2022-02-28');
+INSERT INTO airplane_pilot VALUES (6, 5, 2, '2022-02-28');
+INSERT INTO airplane_pilot VALUES (7, 4, 2, '2022-02-28');
+INSERT INTO airplane_pilot VALUES (8, 1, 1, '2022-02-28');
+
+
+Сам запрос:
+
+SELECT last_name, COUNT(*) AS number_of_flights FROM airplane_pilot 
+JOIN pilot ON airplane_pilot.pilot_id=pilot.pilot_id
+WHERE flight_date BETWEEN '2022-02-01' AND '2022-02-28'
+AND airplane_id IN (SELECT airplane_id FROM airplane WHERE model = 'Сухой')
+GROUP BY last_name;
+
+Альтернативный вариант - с двумя JOIN:
+
+SELECT last_name, COUNT(*) AS number_of_flights FROM airplane_pilot
+JOIN pilot ON airplane_pilot.pilot_id=pilot.pilot_id
+JOIN airplane ON airplane.airplane_id=airplane_pilot.airplane_id
+WHERE flight_date BETWEEN '2022-02-01' AND '2022-02-28'
+AND model = 'Сухой'
+GROUP BY last_name;
